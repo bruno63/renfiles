@@ -1,5 +1,6 @@
 package renfiles;
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -35,10 +36,12 @@ public class RenameFiles {
 	private static final String CN = "RenameFiles";
 	private static boolean testMode = false;  
 	// private static boolean testMode = true; // TODO: reset to false after testing completed
-	private static boolean debugMode = false;
+	private static boolean debugMode = true;
 	// private static boolean debugMode = true; // TODO: reset to false after testing completed
 	private static String srcDirName = ".";
 	private static String destDirName = ".";
+	private static String podcastSrcDirName = ".";
+	private static String podcastDestDirName = ".";
 	private File workDir = null;
 
 	/**
@@ -55,10 +58,14 @@ public class RenameFiles {
 		_props.load(new FileInputStream("renfiles.properties"));
 		destDirName = saveReadProperty(_props, "destDirName", destDirName);
 		srcDirName = saveReadProperty(_props, "srcDirName", srcDirName);
+		podcastSrcDirName = saveReadProperty(_props, "podcastSrcDirName", podcastSrcDirName);
+		podcastDestDirName = saveReadProperty(_props, "podcastDestDirName", podcastDestDirName);
 
 		if (debugMode) {
 			System.out.println("srcDirName=" + srcDirName);
 			System.out.println("destDirName=" + destDirName);
+			System.out.println("podcastSrcDirName=" + podcastSrcDirName);
+			System.out.println("podcastDestDirName=" + podcastDestDirName);
 		}
 		workDir = new File(srcDirName).getCanonicalFile();
 	}
@@ -148,11 +155,29 @@ public class RenameFiles {
 				if (_fileList[i].isFile()) {  // handle all files
 					_renfiles.convertPdfFile(_fileList[i]);
 				}
-				// else it is a directoy
+				// else it is a directory
 			}
 			_renfiles.saveBentoBackups();
 			_renfiles.saveShakehandsBackups();
 			_renfiles.saveSoftwareFiles();
+			
+			// handle podcast files
+			// check the existance of the source and destination directory
+			File _podcastSrcDir = new File(podcastSrcDirName);
+			File _podcastDestDir = new File(podcastDestDirName);
+			if (_podcastSrcDir.exists() && _podcastDestDir.exists()) {
+				// apply the conversion for each podcast
+				_renfiles.convertPodcast(_podcastSrcDir, _podcastDestDir, "10vor10", "10vor10_", "10vor10");
+				_renfiles.convertPodcast(_podcastSrcDir, _podcastDestDir, "DOK", "dok_", "Dok");
+				_renfiles.convertPodcast(_podcastSrcDir, _podcastDestDir, "ECO", "eco_", "Eco");
+				_renfiles.convertPodcast(_podcastSrcDir, _podcastDestDir, "Einstein", "einstein_", "Einstein");
+				_renfiles.convertPodcast(_podcastSrcDir, _podcastDestDir, "Giacobbo---M--ller", "giacobbomueller_", "GiacobboMueller");
+				_renfiles.convertPodcast(_podcastSrcDir, _podcastDestDir, "Kassensturz", "kassensturz_", "Kassensturz");
+				_renfiles.convertPodcast(_podcastSrcDir, _podcastDestDir, "Reporter", "reporter_", "Reporter");
+				_renfiles.convertPodcast(_podcastSrcDir, _podcastDestDir, "Tagesschau", "ts20_", "Tagesschau");
+				_renfiles.convertPodcast(_podcastSrcDir, _podcastDestDir, "TEDTalks--video-", "tedtalks", "tedtalks");
+			}
+			
 			System.out.println("****** completed successfully **********");
 
 		}
@@ -163,6 +188,51 @@ public class RenameFiles {
 			}
 		}
 
+	}
+
+	private void convertPodcast(File _podcastSrcDir, File _podcastDestDir, String podcastName, String prefix, String destName) throws IOException {
+		File _destF = null;
+		String _dateStr = null;
+		String _tags = "dNews"; // comma-separated list of tags
+		File _srcDir = new File(_podcastSrcDir, podcastName);
+
+		File[] _fileList = selectFiles(_srcDir, ".mp4"); // select all pdf files
+		for (int i = 0; i < _fileList.length; i++) {
+			if (_fileList[i].isFile()) {  // handle all files
+				if (prefix.startsWith("tedtalks")) {
+					SimpleDateFormat _dateFormat = new SimpleDateFormat("yyyyMMdd");
+					_dateStr = _dateFormat.format(_fileList[i].lastModified()); 
+					_destF = new File(_podcastDestDir, destName + "/" + _dateStr + destName + _fileList[i].getName().substring(0, _fileList[i].getName().length()-10) + ".mp4");
+					_tags = "tTech";
+				} else {
+					_dateStr = _fileList[i].getName().substring(prefix.length(), prefix.length()+8);
+					_destF = new File(_podcastDestDir, destName.toLowerCase() + "/" + _dateStr + "sfdrs" + destName + ".mp4");
+				}				
+				if (testMode) {  // just print out what would be done
+					System.out.print("mv " + _fileList[i].getName() + " " + _destF.getCanonicalPath());
+					if (_tags != null && _tags.length() > 0) {
+						System.out.println(", adding tags: " + _tags);
+						if (debugMode) {
+							System.out.println("/usr/local/bin/tag -a " + _tags + " " + _destF.getCanonicalPath());
+						}
+					}
+					else { 
+						System.out.println(", no tags added");
+					}
+				}
+				else {  // execute the conversion
+					if (_fileList[i].renameTo(_destF) == true) {
+						if (_tags != null && _tags.length() > 0) {
+							Runtime.getRuntime().exec("/usr/local/bin/tag -a " + _tags + " " + _destF.getCanonicalPath());
+						}
+					}
+					else {
+						System.out.println("conversion of " + _fileList[i].getName() + " failed.");
+					}
+				}
+			}
+			// else it is a directory 
+		}
 	}
 
 	/**
