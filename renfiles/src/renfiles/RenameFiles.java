@@ -35,8 +35,11 @@ import java.util.*;
 public class RenameFiles {
 	private static boolean testMode = false;  
 <<<<<<< HEAD
+<<<<<<< HEAD
 	private static boolean debugMode = false;
 =======
+=======
+>>>>>>> 9a6a3ab1d90b29a407279d0f9fa62db4298b2dd6
 	// private static boolean testMode = true; // TODO: reset to false after testing completed
 	private static boolean debugMode = true;
 	// private static boolean debugMode = true; // TODO: reset to false after testing completed
@@ -61,8 +64,13 @@ public class RenameFiles {
 		destDirName = saveReadProperty(_props, "destDirName", destDirName);
 		srcDirName = saveReadProperty(_props, "srcDirName", srcDirName);
 <<<<<<< HEAD
+<<<<<<< HEAD
 		testMode = saveReadBooleanProperty(_props, "testMode", testMode);
 		debugMode = saveReadBooleanProperty(_props, "debugMode", debugMode);
+=======
+		podcastSrcDirName = saveReadProperty(_props, "podcastSrcDirName", podcastSrcDirName);
+		podcastDestDirName = saveReadProperty(_props, "podcastDestDirName", podcastDestDirName);
+>>>>>>> 9a6a3ab1d90b29a407279d0f9fa62db4298b2dd6
 =======
 		podcastSrcDirName = saveReadProperty(_props, "podcastSrcDirName", podcastSrcDirName);
 		podcastDestDirName = saveReadProperty(_props, "podcastDestDirName", podcastDestDirName);
@@ -72,8 +80,13 @@ public class RenameFiles {
 			System.out.println("srcDirName=" + srcDirName);
 			System.out.println("destDirName=" + destDirName);
 <<<<<<< HEAD
+<<<<<<< HEAD
 			System.out.println("debugMode=" + debugMode);
 			System.out.println("testMode=" + debugMode);
+=======
+			System.out.println("podcastSrcDirName=" + podcastSrcDirName);
+			System.out.println("podcastDestDirName=" + podcastDestDirName);
+>>>>>>> 9a6a3ab1d90b29a407279d0f9fa62db4298b2dd6
 =======
 			System.out.println("podcastSrcDirName=" + podcastSrcDirName);
 			System.out.println("podcastDestDirName=" + podcastDestDirName);
