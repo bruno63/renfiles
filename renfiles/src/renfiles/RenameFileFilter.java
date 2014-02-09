@@ -1,6 +1,5 @@
 package renfiles;
 import java.io.File;
-import java.io.IOException;
 
 /**
  * A FilenameFilter with a configurable selection criteria.

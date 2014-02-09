@@ -1,5 +1,6 @@
 package renfiles;
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -32,33 +33,51 @@ import java.util.*;
  * @version $Id$
  */
 public class RenameFiles {
-	private static final String CN = "RenameFiles";
 	private static boolean testMode = false;  
-	// private static boolean testMode = true; // TODO: reset to false after testing completed
+<<<<<<< HEAD
 	private static boolean debugMode = false;
+=======
+	// private static boolean testMode = true; // TODO: reset to false after testing completed
+	private static boolean debugMode = true;
 	// private static boolean debugMode = true; // TODO: reset to false after testing completed
+>>>>>>> 9a6a3ab1d90b29a407279d0f9fa62db4298b2dd6
 	private static String srcDirName = ".";
 	private static String destDirName = ".";
+	private static String podcastSrcDirName = ".";
+	private static String podcastDestDirName = ".";
 	private File workDir = null;
 
 	/**
-	 * Constructor takes the command line parameters as arguments.
+	 * Constructor.
+	 * The idea is to start this programm out of Eclipse and to control it via properties settings. 
+	 * Therefore, command line parameters are not supported.
 	 * 
-	 * @param args			the command line parameters (@see #printUsage()) for a list of valid arguments.
 	 * @throws IOException
 	 */
-	public RenameFiles(String[] args) throws IOException {
-		handleArgs(args);
-
+	public RenameFiles() throws IOException {
 		// load default configuration in the project root directory
 		Properties _props = new Properties();
 		_props.load(new FileInputStream("renfiles.properties"));
 		destDirName = saveReadProperty(_props, "destDirName", destDirName);
 		srcDirName = saveReadProperty(_props, "srcDirName", srcDirName);
+<<<<<<< HEAD
+		testMode = saveReadBooleanProperty(_props, "testMode", testMode);
+		debugMode = saveReadBooleanProperty(_props, "debugMode", debugMode);
+=======
+		podcastSrcDirName = saveReadProperty(_props, "podcastSrcDirName", podcastSrcDirName);
+		podcastDestDirName = saveReadProperty(_props, "podcastDestDirName", podcastDestDirName);
+>>>>>>> 9a6a3ab1d90b29a407279d0f9fa62db4298b2dd6
 
 		if (debugMode) {
 			System.out.println("srcDirName=" + srcDirName);
 			System.out.println("destDirName=" + destDirName);
+<<<<<<< HEAD
+			System.out.println("debugMode=" + debugMode);
+			System.out.println("testMode=" + debugMode);
+=======
+			System.out.println("podcastSrcDirName=" + podcastSrcDirName);
+			System.out.println("podcastDestDirName=" + podcastDestDirName);
+>>>>>>> 9a6a3ab1d90b29a407279d0f9fa62db4298b2dd6
 		}
 		workDir = new File(srcDirName).getCanonicalFile();
 	}
@@ -81,8 +100,7 @@ public class RenameFiles {
 	 * @return              a valid configuration value, either from the properties or the default
 	 */
 	private static String saveReadProperty(Properties config, String key, String defaultValue) {
-		String _value = null;
-		_value = config.getProperty(key);
+		String _value = config.getProperty(key);
 		if (_value != null) {
 			return _value;
 		}
@@ -90,48 +108,22 @@ public class RenameFiles {
 			return defaultValue;
 		}
 	}
-
+	
 	/**
-	 * Parses the command line arguments into class variables.
+	 * Reads a boolean value from configuration properties safely, i.e.
+	 * if the value is not set, the default value is returned instead.
 	 * 
-	 * @param args	the command line parameters (@see #printUsage()) for a list of valid arguments.
+	 * @param config		the configuration properties
+	 * @param key			the key of the configuration attribute
+	 * @param defaultValue  the default value of the configuration attribute
+	 * @return              a valid boolean configuration value, either from the properties or the default
 	 */
-	private void handleArgs(String[] args) {
-		for (int i = 0; i < args.length; i++) {
-			if (args[i].startsWith("-h") || args[i].startsWith("-H") || args[i].startsWith("-?")) {
-				printUsage();
-				System.exit(0);
-			}
-			else if (args[i].startsWith("-d") || args[i].startsWith("-D")) {
-				debugMode = true;
-			}
-			else if (args[i].startsWith("-t") || args[i].startsWith("-T")) {
-				testMode = true;
-			}
-			// TODO: add recursive mode
-			else {
-				System.out.println("unknown argument: " + args[i] + " in class " + CN);
-				printUsage();
-			}
+	private boolean saveReadBooleanProperty(Properties config, String key, boolean defaultValue) {
+		String _value = config.getProperty(key);
+		if (_value != null) {
+			return new Boolean(_value).booleanValue();
 		}
-
-	}
-
-	/**
-	 * Prints a usage message onto stdout.
-	 */
-	private void printUsage() {
-		System.out.println("");
-		System.out.println("-----------------------------------------------------------------------------");
-		System.out.println("usage:");
-		System.out.println("    renfiles -h[elp] | -<options>");
-		System.out.println("      options are:");
-		System.out.println("        d[ebug Mode]         debug mode; help finding errors");
-		System.out.println("        t[est-only]          test mode; nothing is changed");
-		System.out.println("        h[elp]               print this usage on stdout");
-		System.out.println("-----------------------------------------------------------------------------");
-		System.out.println("");
-
+		return defaultValue;
 	}
 
 	/**
@@ -142,17 +134,35 @@ public class RenameFiles {
 	 */
 	public static void main(String[] args) {
 		try {
-			RenameFiles _renfiles = new RenameFiles(args);
+			RenameFiles _renfiles = new RenameFiles();
 			File[] _fileList = _renfiles.selectFiles(_renfiles.getCurrentDirectory(), ".pdf"); // select all pdf files
 			for (int i = 0; i < _fileList.length; i++) {
 				if (_fileList[i].isFile()) {  // handle all files
 					_renfiles.convertPdfFile(_fileList[i]);
 				}
-				// else it is a directoy
+				// else it is a directory
 			}
 			_renfiles.saveBentoBackups();
 			_renfiles.saveShakehandsBackups();
 			_renfiles.saveSoftwareFiles();
+			
+			// handle podcast files
+			// check the existance of the source and destination directory
+			File _podcastSrcDir = new File(podcastSrcDirName);
+			File _podcastDestDir = new File(podcastDestDirName);
+			if (_podcastSrcDir.exists() && _podcastDestDir.exists()) {
+				// apply the conversion for each podcast
+				_renfiles.convertPodcast(_podcastSrcDir, _podcastDestDir, "10vor10", "10vor10_", "10vor10");
+				_renfiles.convertPodcast(_podcastSrcDir, _podcastDestDir, "DOK", "dok_", "Dok");
+				_renfiles.convertPodcast(_podcastSrcDir, _podcastDestDir, "ECO", "eco_", "Eco");
+				_renfiles.convertPodcast(_podcastSrcDir, _podcastDestDir, "Einstein", "einstein_", "Einstein");
+				_renfiles.convertPodcast(_podcastSrcDir, _podcastDestDir, "Giacobbo---M--ller", "giacobbomueller_", "GiacobboMueller");
+				_renfiles.convertPodcast(_podcastSrcDir, _podcastDestDir, "Kassensturz", "kassensturz_", "Kassensturz");
+				_renfiles.convertPodcast(_podcastSrcDir, _podcastDestDir, "Reporter", "reporter_", "Reporter");
+				_renfiles.convertPodcast(_podcastSrcDir, _podcastDestDir, "Tagesschau", "ts20_", "Tagesschau");
+				_renfiles.convertPodcast(_podcastSrcDir, _podcastDestDir, "TEDTalks--video-", "tedtalks", "tedtalks");
+			}
+			
 			System.out.println("****** completed successfully **********");
 
 		}
@@ -163,6 +173,51 @@ public class RenameFiles {
 			}
 		}
 
+	}
+
+	private void convertPodcast(File _podcastSrcDir, File _podcastDestDir, String podcastName, String prefix, String destName) throws IOException {
+		File _destF = null;
+		String _dateStr = null;
+		String _tags = "dNews"; // comma-separated list of tags
+		File _srcDir = new File(_podcastSrcDir, podcastName);
+
+		File[] _fileList = selectFiles(_srcDir, ".mp4"); // select all pdf files
+		for (int i = 0; i < _fileList.length; i++) {
+			if (_fileList[i].isFile()) {  // handle all files
+				if (prefix.startsWith("tedtalks")) {
+					SimpleDateFormat _dateFormat = new SimpleDateFormat("yyyyMMdd");
+					_dateStr = _dateFormat.format(_fileList[i].lastModified()); 
+					_destF = new File(_podcastDestDir, destName + "/" + _dateStr + destName + _fileList[i].getName().substring(0, _fileList[i].getName().length()-10) + ".mp4");
+					_tags = "tTech";
+				} else {
+					_dateStr = _fileList[i].getName().substring(prefix.length(), prefix.length()+8);
+					_destF = new File(_podcastDestDir, destName.toLowerCase() + "/" + _dateStr + "sfdrs" + destName + ".mp4");
+				}				
+				if (testMode) {  // just print out what would be done
+					System.out.print("mv " + _fileList[i].getName() + " " + _destF.getCanonicalPath());
+					if (_tags != null && _tags.length() > 0) {
+						System.out.println(", adding tags: " + _tags);
+						if (debugMode) {
+							System.out.println("/usr/local/bin/tag -a " + _tags + " " + _destF.getCanonicalPath());
+						}
+					}
+					else { 
+						System.out.println(", no tags added");
+					}
+				}
+				else {  // execute the conversion
+					if (_fileList[i].renameTo(_destF) == true) {
+						if (_tags != null && _tags.length() > 0) {
+							Runtime.getRuntime().exec("/usr/local/bin/tag -a " + _tags + " " + _destF.getCanonicalPath());
+						}
+					}
+					else {
+						System.out.println("conversion of " + _fileList[i].getName() + " failed.");
+					}
+				}
+			}
+			// else it is a directory 
+		}
 	}
 
 	/**
