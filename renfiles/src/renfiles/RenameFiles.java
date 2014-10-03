@@ -34,9 +34,10 @@ import java.util.*;
  */
 public class RenameFiles {
 	private static boolean testMode = false;  
-	private static boolean debugMode = false;
+	private static boolean debugMode = false;	
 	private static String srcDirName = ".";
-	private static String destDirName = ".";
+	private static String docDirName = ".";
+	private static String newsDirName = ".";
 	private static String podcastSrcDirName = ".";
 	private static String podcastDestDirName = ".";
 	private File workDir = null;
@@ -52,7 +53,8 @@ public class RenameFiles {
 		// load default configuration in the project root directory
 		Properties _props = new Properties();
 		_props.load(new FileInputStream("renfiles.properties"));
-		destDirName = saveReadProperty(_props, "destDirName", destDirName);
+		docDirName = saveReadProperty(_props, "docDirName", docDirName);
+		newsDirName = saveReadProperty(_props, "newsDirName", newsDirName);
 		srcDirName = saveReadProperty(_props, "srcDirName", srcDirName);
 		testMode = saveReadBooleanProperty(_props, "testMode", testMode);
 		debugMode = saveReadBooleanProperty(_props, "debugMode", debugMode);
@@ -61,7 +63,8 @@ public class RenameFiles {
 
 		if (debugMode) {
 			System.out.println("srcDirName=" + srcDirName);
-			System.out.println("destDirName=" + destDirName);
+			System.out.println("docDirName=" + docDirName);
+			System.out.println("newsDirName=" + newsDirName);
 			System.out.println("debugMode=" + debugMode);
 			System.out.println("testMode=" + debugMode);
 			System.out.println("podcastSrcDirName=" + podcastSrcDirName);
@@ -169,7 +172,7 @@ public class RenameFiles {
 		String _tags = "dNews"; // comma-separated list of tags
 		File _srcDir = new File(_podcastSrcDir, podcastName);
 
-		File[] _fileList = selectFiles(_srcDir, ".mp4"); // select all pdf files
+		File[] _fileList = selectFiles(_srcDir, ".mp4"); // select all mp4 movie files
 		for (int i = 0; i < _fileList.length; i++) {
 			if (_fileList[i].isFile()) {  // handle all files
 				if (prefix.startsWith("tedtalks")) {
@@ -237,54 +240,55 @@ public class RenameFiles {
 
 		if (f.getName().startsWith("NZZS_")) { // NZZ am Sonntag epaper
 			_destFN = f.getName().substring(5, 13) + "nzzs.pdf";
-			_destDirName = destDirName + "/nzzs";
+			_destDirName = newsDirName + File.separator + "nzzs" + File.separator + _destFN.substring(0, 4);
 		}
 		else if (f.getName().startsWith("NZZ_")) {  // NZZ epaper
 			_destFN = f.getName().substring(4,12) + "nzz.pdf";	
-			_destDirName = destDirName + "/nzz";
+			_destDirName = newsDirName + File.separator + "nzz" + File.separator + _destFN.substring(0, 4);
 		}
 		else if (f.getName().endsWith("_zsr.pdf")) {  // Zürichsee Zeitung epaper
 			_destFN = f.getName().substring(0, 8) + "zsz.pdf";	
-			_destDirName = destDirName + "/zsz";
+			_destDirName = newsDirName + File.separator + "zsz" + File.separator + _destFN.substring(0, 4);
 		}
 		else if (f.getName().startsWith("ZH_")) {  // 20 Minuten epaper
 			_destFN = f.getName().substring(3,11) + "_20min.pdf";	
-			_destDirName = destDirName + "/20min";
+			_destDirName = newsDirName + File.separator + "20min" + File.separator + _destFN.substring(0, 4);
 		}
 		else if (f.getName().startsWith("taz-ges-")) {  // Tages-Anzeiger epaper
 			_destFN = f.getName().substring(8,12) + 
 					f.getName().substring(13, 15) +
 					f.getName().substring(16, 18) + "tagesanzeiger.pdf";	
-			_destDirName = destDirName + "/tagesanzeiger";
+			_destDirName = newsDirName + File.separator + "tagesanzeiger" + File.separator + _destFN.substring(0, 4);
 		}
 		else if (f.getName().startsWith("sonze-")) {  // Sonntagszeitung epaper
 			_destFN = f.getName().substring(6,10) + 
 					f.getName().substring(11, 13) +
 					f.getName().substring(14, 16) + "sonntagszeitung.pdf";	
-			_destDirName = destDirName + "/sonntagszeitung";
+			_destDirName = newsDirName + File.separator + "sonntagszeitung" + File.separator + _destFN.substring(0, 4);
 		}
 		else if (f.getName().startsWith("EQUITY_")) {  // NZZ Equity
 			_destFN = f.getName().substring(7,15) + "nzzEquity.pdf";	
-			_destDirName = destDirName + "/nzzEquity";
+			_destDirName = newsDirName + File.separator + "nzzEquity";
 		}
 		else if (f.getName().startsWith("FOLIO_")) {  // NZZ Folio
 			_destFN = f.getName().substring(6,14) + "nzzFolio.pdf";	
-			_destDirName = destDirName + "/nzzFolio";
+			_destDirName = newsDirName + File.separator + "nzzFolio";
 		}
 		else if (f.getName().startsWith("GESE_")) {  // NZZ Gesellschaft
 			_destFN = f.getName().substring(5,13) + "nzzGesellschaft.pdf";	
-			_destDirName = destDirName + "/nzzGesellschaft";
+			_destDirName = newsDirName + File.separator + "nzzGesellschaft";
 		}
 		else if (f.getName().startsWith("communications")) {	// ACM Communications
 			_destFN = f.getName().substring(14,20) + "00acmCommunications.pdf";
-			_destDirName = destDirName + "/acmCommunications"; 
+			_destDirName = newsDirName + File.separator + 
+					File.separator + "acmCommunications"  + File.separator + _destFN.substring(0, 4);
 			_tags = "oAcm,dMagazine,tTech";
 		}
 		else if (f.getName().startsWith("compw-")) {
 			_destFN = f.getName().substring(6, 10) + 
 					f.getName().substring(11, 13) +
 					f.getName().substring(14, 16) + "computerworld.pdf";
-			_destDirName = destDirName + "/computerworld";
+			_destDirName = newsDirName + File.separator + "computerworld" + File.separator + _destFN.substring(0, 4);
 			_tags = "dNews,tTech";
 		}
 		else if (f.getName().startsWith("input_gl")) {
@@ -309,108 +313,136 @@ public class RenameFiles {
 				}
 			}
 			_destFN = _meetDate + "glinput" + _userName + ".pdf";
-			_destDirName = destDirName + "/" + _meetDate + "gl";
+			_destDirName = docDirName + File.separator + 
+					"business" + File.separator + 
+					"adnovum" + File.separator +
+					"meet" + File.separator + 
+					"gl" + File.separator + 
+					_destFN.substring(0, 4) + File.separator +
+					_meetDate + "glmeet";
 			_tags = "oAdnovum,dMinutes,lZuerich";
 		}
 		else if (f.getName().startsWith("kw")) {
 			String _meetDate = f.getName().substring(13, 21);
 			_destFN = _meetDate + "mmgl.pdf";
-			_destDirName = destDirName +"/" + _meetDate + "gl";
+			_destDirName = docDirName + File.separator + 
+					"business" + File.separator + 
+					"adnovum" + File.separator +
+					"meet" + File.separator + 
+					"gl" + File.separator + 
+					_destFN.substring(0, 4) + File.separator +
+					_meetDate + "glmeet";
 			_tags = "oAdnovum,dMinutes,lZuerich";
 		}
 		else if ((_dateStr = getLeadingDateFromString(f.getName())) != null) { // file name starts with date
 			_destFN = f.getName();
 			if (f.getName().substring(8).startsWith("ic") && _dateStr.length()>=6) {		// Inside Channels
-				_destDirName = destDirName + "/insideChannels/" + _dateStr.substring(0, 4) 
-						+ "/" + _dateStr.substring(4,6);
+				_destDirName = newsDirName + File.separator + 
+						"insideChannels" + File.separator + 
+						_dateStr.substring(0, 4) + File.separator + 
+						_dateStr.substring(4,6);
 				_tags = "dNews,tTech";
 			}
 			else if (f.getName().substring(8).startsWith("rg") && _dateStr.length()>=6) {		// Rechnung / Bill
-				_destDirName = destDirName + "/finance";
+				_destDirName = docDirName + File.separator + 
+						"finance" + File.separator +
+						"rechnungen" + File.separator +
+						f.getName().substring(0, 4);
 				_tags = "tFinance,dBill";
 			}
 			else if (f.getName().substring(8).startsWith("zkb") && _dateStr.length()>=6) {		// ZKB
-				_destDirName = destDirName + "/finance";
+				_destDirName = docDirName + File.separator + 
+						"finance" +  File.separator +
+						"bank" +  File.separator +
+						"zkbPriv";
 				_tags = "tFinance,dBill,oZkb";
 			}
 			else if (f.getName().substring(8).startsWith("pf") && _dateStr.length()>=6) {		// PostFinance
-				_destDirName = destDirName + "/finance";				
+				_destDirName = docDirName + File.separator + 
+						"finance" +  File.separator +
+						"bank" +  File.separator +
+						"pfBruno";				
 				_tags = "tFinance,dBill,oPost";
 			}
 			else if (f.getName().substring(8).startsWith("lohn") && _dateStr.length()>=6) {		// Lohn / Salary
-				_destDirName = destDirName + "/finance";
+				_destDirName = docDirName + File.separator + 
+						"finance" +  File.separator + "lohn";
 				_tags = "tFinance,dStatement";
 			}
 			else if (f.getName().substring(8).startsWith("slkk") && _dateStr.length()>=6) {		// SLKK
-				_destDirName = destDirName + "/finance";
+				_destDirName = docDirName + File.separator + 
+						"finance" + File.separator +
+						"versicherungen";
 				_tags = "tFinance,tInsurance,oSlkk";
 			}
-			else if (f.getName().substring(8).startsWith("mmb") && _dateStr.length()>=6) {		// meeting minutes
-				_destDirName = destDirName + "/adnovum";
-				_tags = "dMinutes,oAdnovum";
-			}
-			else if (f.getName().substring(8).startsWith("karte") && _dateStr.length()>=6) {	// Postcard 
-				_destDirName = destDirName + "/corr";
-				_tags = "dCorr,DPcard";
-			}
 			else if (f.getName().substring(8).startsWith("diary") && _dateStr.length()>=6) {	// diary
-				_destDirName = destDirName + "/diary";
+				_destDirName = docDirName + File.separator + 
+						"diary" + File.separator +
+						"201x" + File.separator +
+						f.getName().substring(0, 4) + File.separator +
+						f.getName().substring(4, 6);
 				_tags = "oBruno,dDiary";
 			}
 			else if (f.getName().substring(8).startsWith("abstract_") && _dateStr.length()>=4) {	// abstracts
-				_destDirName = destDirName + "/abstract/" + _dateStr.substring(0,4);	
+				_destDirName = docDirName + File.separator + 
+						"abstract" + File.separator +
+						_dateStr.substring(0,4);	
 				_tags = "dAbstract";
 			}
 			else if (f.getName().substring(8).startsWith("kof") && _dateStr.length()>=6) {	// KOF reports
-				_destDirName = destDirName + "/kof";	
+				_destDirName = newsDirName + File.separator + "kofBulletin";	
 				_tags = "dReport,tEco";
 			}
 			else if (f.getName().substring(8).startsWith("book") && _dateStr.length()>=6) {	// ebook
-				_destDirName = destDirName + "/book";	
+				_destDirName = docDirName + File.separator + 
+						"temp" + File.separator +
+						"topics";	
 				_tags = "dBook";
 			}
 			else if (f.getName().substring(8).startsWith("sise") && _dateStr.length()>=6) {		// SI-SE
-				_destDirName = destDirName + "/sise";
+				_destDirName = docDirName + File.separator + "siseItgse";
 				_tags = "oSise";
 			}
 			else if (f.getName().substring(8).startsWith("awuz") && _dateStr.length()>=6) {		// AWUZ
-				_destDirName = destDirName + "/awuz";	
+				_destDirName = docDirName + File.separator + "awuz";	
 				_tags = "oAwuzUzha";
 			}
 			else if (f.getName().substring(8).startsWith("informatikSpektrum") && _dateStr.length()>=6) {		// Informatik Spektruml
-				_destDirName = destDirName + "/informatikSpektrum";	
+				_destDirName = newsDirName + File.separator + 
+						"informatikSpektrum" + File.separator +
+						f.getName().substring(0, 4);	
 				_tags = "tTech,dArticle";
 			}
 			else if (f.getName().toLowerCase().endsWith("pres.pdf")) {						// presentation
-				_destDirName = destDirName;
+				_destDirName = docDirName + File.separator + "temp";
 				_tags = "dPres";
 			}
 			else if (f.getName().substring(8).startsWith("itc") && _dateStr.length()>=6) {		// IT consulting contract
-				_destDirName = destDirName;
+				_destDirName = docDirName + File.separator + "temp";
 				_tags = "dContract,dItc";
 			}
 			else if (f.getName().substring(8).startsWith("swd") && _dateStr.length()>=6) {		// SW development contract
-				_destDirName = destDirName;
+				_destDirName = docDirName + File.separator + "temp";
 				_tags = "dContract,dSwd";
 			}
 			else if (f.getName().substring(8).startsWith("sla") && _dateStr.length()>=6) {		// maintenance contract
-				_destDirName = destDirName;
+				_destDirName = docDirName + File.separator + "temp";
 				_tags = "dContract,dSla";
 			}
 			else if (f.getName().substring(8).startsWith("nda") && _dateStr.length()>=6) {		// non disclosure agreement
-				_destDirName = destDirName;
+				_destDirName = docDirName + File.separator + "temp";
 				_tags = "dContract,dNda";
 			}
 			else if (f.getName().substring(8).startsWith("offer") && _dateStr.length()>=6) {		// proposal
-				_destDirName = destDirName;
+				_destDirName = docDirName + File.separator + "temp";
 				_tags = "dContract,dOffer";
 			}
 
 			else {  // there is a leading date, but no special meaning
 				if (debugMode) {
-					System.out.println(f.getName() + " has leading date, but no meaning");
+					System.out.println(f.getName() + " has leading date, but no meaning -> moving to temp without tags");
 				}
-				_destDirName = destDirName;  // move file as is, do not add tags
+				_destDirName = docDirName + File.separator + "temp";  // move file as is, do not add tags
 				_tags = null;
 			}
 
@@ -543,14 +575,17 @@ public class RenameFiles {
 					String _destFN = _backupFiles[i].getName().substring(15,19) + 
 							_backupFiles[i].getName().substring(20, 22) +
 							_backupFiles[i].getName().substring(23, 25) + ".bentodb";	
-					String _destDirName = destDirName + "/backup/bento";
+					String _destDirName = docDirName + File.separator + 
+							"temp" + File.separator +
+							"toPegasus" + File.separator +
+							"backup";
 					if (debugMode) { // just print out what would be done
 						System.out.println("mkdir " + new File(_destDirName).getCanonicalPath());
 					}
 					if (testMode == false) {
 						new File(_destDirName).mkdirs(); 			
 					}
-					File _destF = new File(_destDirName + "/" + _destFN);
+					File _destF = new File(_destDirName + File.separator + _destFN);
 					if (testMode) {  // just print out what would be done
 						System.out.println("mv " + _backupFiles[i].getName() + " " + _destF.getCanonicalPath());
 					}
@@ -588,14 +623,17 @@ public class RenameFiles {
 							// 		yyyy-mm-dd hh-mm-ss / Business.sdb -> yyyyMMdd.sdb	
 							String _destFN = _dirName.substring(0,4) + 
 									_dirName.substring(5,7) + _dirName.substring(8,10) + ".sdb";
-							String _destDirName = destDirName + "/backup/shakehands";
+							String _destDirName = docDirName + File.separator + 
+									"temp" + File.separator +
+									"toPegasus" + File.separator +
+									"backup";
 							if (debugMode == true) { // just print out what would be done
 								System.out.println("mkdir " + new File(_destDirName).getCanonicalPath());
 							}
 							if (testMode == false) {
 								new File(_destDirName).mkdirs(); 			
 							}
-							File _destF = new File(_destDirName + "/" + _destFN);
+							File _destF = new File(_destDirName + File.separator + _destFN);
 							if (testMode) {  // just print out what would be done
 								System.out.println("mv " + _backupFiles[i].getName() + " " + _destF.getCanonicalPath());
 							}
@@ -626,14 +664,17 @@ public class RenameFiles {
 			File[] _swFiles = selectFiles(getCurrentDirectory(), ".dmg");
 				for (int i = 0; i < _swFiles.length; i++) {
 				if (_swFiles[i].isFile()) {  // handle all files
-					String _destDirName = destDirName + "/software";
+					String _destDirName = docDirName + File.separator + 
+							"temp" + File.separator +
+							"toPegasus" + File.separator +
+							"software";
 					if (debugMode == true) { // just print out what would be done
 						System.out.println("mkdir " + new File(_destDirName).getCanonicalPath());
 					}
 					if (testMode == false) {
 						new File(_destDirName).mkdirs(); 			
 					}
-					File _destF = new File(_destDirName + "/" + _swFiles[i].getName());
+					File _destF = new File(_destDirName + File.separator + _swFiles[i].getName());
 					if (testMode) {  // just print out what would be done
 						System.out.println("mv " + _swFiles[i].getName() + " " + _destF.getCanonicalPath());
 					}
